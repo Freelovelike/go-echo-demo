@@ -1,0 +1,323 @@
+basePath: /api
+definitions:
+  dto.CreateTodoDto:
+    properties:
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - title
+    type: object
+  dto.DeleteTodoDto:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  dto.LoginAndRegisterDto:
+    properties:
+      password:
+        maxLength: 32
+        minLength: 6
+        type: string
+      username:
+        maxLength: 32
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.UpdateTodoDto:
+    properties:
+      completed:
+        type: boolean
+      id:
+        type: integer
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - id
+    - title
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  model.Todo:
+    properties:
+      completed:
+        type: boolean
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      title:
+        type: string
+      updatedAt:
+        type: string
+      userID:
+        type: integer
+    type: object
+  model.User:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      password:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
+  response.ResCode:
+    enum:
+    - 200
+    - 400001
+    - 400002
+    - 400003
+    - 400004
+    - 500001
+    - 500002
+    type: integer
+    x-enum-comments:
+      CodeDBError: 数据库操作失败
+      CodeInternalError: 服务器内部错误
+      CodeInvalidParam: 参数错误
+      CodeInvalidPass: 密码错误
+      CodeUserExist: 用户已存在
+      CodeUserNotExist: 用户不存在
+    x-enum-descriptions:
+    - ""
+    - 参数错误
+    - 用户已存在
+    - 用户不存在
+    - 密码错误
+    - 服务器内部错误
+    - 数据库操作失败
+    x-enum-varnames:
+    - CodeSuccess
+    - CodeInvalidParam
+    - CodeUserExist
+    - CodeUserNotExist
+    - CodeInvalidPass
+    - CodeInternalError
+    - CodeDBError
+  response.Response:
+    properties:
+      code:
+        $ref: '#/definitions/response.ResCode'
+      data: {}
+      msg:
+        type: string
+    type: object
+  vo.LoginAndRegisterVo:
+    properties:
+      id:
+        type: integer
+      token:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:1323
+info:
+  contact: {}
+  description: This is a sample Todo API server.
+  title: Go Echo Demo API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: 通过用户名和密码获取 JWT Token
+      parameters:
+      - description: 登录信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginAndRegisterDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/vo.LoginAndRegisterVo'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 用户登录
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: 注册新用户
+      parameters:
+      - description: 注册信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginAndRegisterDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.User'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 用户注册
+      tags:
+      - Auth
+  /todo:
+    delete:
+      consumes:
+      - application/json
+      description: 根据 ID 删除待办事项
+      parameters:
+      - description: 删除信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeleteTodoDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 删除待办事项
+      tags:
+      - Todo
+    get:
+      consumes:
+      - application/json
+      description: 获取当前用户的待办事项列表，支持分页
+      parameters:
+      - in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - in: query
+        minimum: 1
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 获取待办事项列表
+      tags:
+      - Todo
+    post:
+      consumes:
+      - application/json
+      description: 创建一个新的待办事项
+      parameters:
+      - description: 待办事项信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTodoDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Todo'
+              type: object
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 创建待办事项
+      tags:
+      - Todo
+    put:
+      consumes:
+      - application/json
+      description: 更新现有脚本的状态或标题
+      parameters:
+      - description: 更新信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateTodoDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 更新待办事项
+      tags:
+      - Todo
+swagger: "2.0"

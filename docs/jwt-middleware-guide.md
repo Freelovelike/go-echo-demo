@@ -160,8 +160,6 @@ curl -X GET http://localhost:8080/api/user/info \
 func SetupUserRoutes(e *echo.Group) {
     userPath := e.Group("/user")
 
-    // 公开接口（不需要认证）
-    userPath.GET("/public", user_handler.PublicController)
 
     // 受保护的接口
     protectedPath := userPath.Group("")

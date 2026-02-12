@@ -13,6 +13,11 @@ import (
 	"github.com/labstack/echo/v5/middleware"
 )
 
+// @title Go Echo Demo API
+// @version 1.0
+// @description This is a sample Todo API server.
+// @host localhost:1323
+// @BasePath /api
 func main() {
 	db.InitDB("postgres://freelove:hwc20010616@localhost:5432/postgres")
 	db.InitRedis("localhost:6379")

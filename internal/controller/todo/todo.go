@@ -9,6 +9,17 @@ import (
 	"github.com/labstack/echo/v5"
 )
 
+// CreateTodoController godoc
+// @Summary 创建待办事项
+// @Description 创建一个新的待办事项
+// @Tags Todo
+// @Accept json
+// @Produce json
+// @Param request body dto.CreateTodoDto true "待办事项信息"
+// @Success 200 {object} response.Response{data=model.Todo} "成功"
+// @Failure 401 {object} response.Response "未授权"
+// @Router /todo [post]
+// @Security ApiKeyAuth
 func CreateTodoController(c *echo.Context) error {
 	userId := middleware.MustGetUserID(c)
 	var dto dto.CreateTodoDto
@@ -25,6 +36,17 @@ func CreateTodoController(c *echo.Context) error {
 	return response.ResOK(c, todo)
 }
 
+// ListTodoController godoc
+// @Summary 获取待办事项列表
+// @Description 获取当前用户的待办事项列表，支持分页
+// @Tags Todo
+// @Accept json
+// @Produce json
+// @Param request query dto.GetTodoListDto true "分页信息"
+// @Success 200 {object} response.Response "成功"
+// @Failure 401 {object} response.Response "未授权"
+// @Router /todo [get]
+// @Security ApiKeyAuth
 func ListTodoController(c *echo.Context) error {
 	userId := middleware.MustGetUserID(c)
 	var dto dto.GetTodoListDto
@@ -41,6 +63,17 @@ func ListTodoController(c *echo.Context) error {
 	return response.ResOK(c, list)
 }
 
+// UpdateTodoController godoc
+// @Summary 更新待办事项
+// @Description 更新现有脚本的状态或标题
+// @Tags Todo
+// @Accept json
+// @Produce json
+// @Param request body dto.UpdateTodoDto true "更新信息"
+// @Success 200 {object} response.Response "成功"
+// @Failure 401 {object} response.Response "未授权"
+// @Router /todo [put]
+// @Security ApiKeyAuth
 func UpdateTodoController(c *echo.Context) error {
 	userId := middleware.MustGetUserID(c)
 	var dto dto.UpdateTodoDto
@@ -57,6 +90,17 @@ func UpdateTodoController(c *echo.Context) error {
 	return response.ResOK(c, nil)
 }
 
+// DeleteTodoController godoc
+// @Summary 删除待办事项
+// @Description 根据 ID 删除待办事项
+// @Tags Todo
+// @Accept json
+// @Produce json
+// @Param request body dto.DeleteTodoDto true "删除信息"
+// @Success 200 {object} response.Response "成功"
+// @Failure 401 {object} response.Response "未授权"
+// @Router /todo [delete]
+// @Security ApiKeyAuth
 func DeleteTodoController(c *echo.Context) error {
 	userId := middleware.MustGetUserID(c)
 	var dto dto.DeleteTodoDto
